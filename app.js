@@ -10,13 +10,22 @@ const blogSchema= {
   title: String,
   content: String
 };
+const UIDSchema = {
+  email: String,
+  pass: String
+} ;
 
 const Blog= mongoose.model("Blog",blogSchema);
 
-const b1= new Blog({
+/*const b1= new Blog({
   title:"Day_1",
   content:"lorem ipsum"
-});
+});*/
+// creating model for the user collection
+const Users = mongoose.model("User", UIDSchema);
+
+
+
 
 //b1.save();
 
@@ -28,6 +37,7 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 const app = express();
 // lodash requiring
 const _ = require('lodash');
+const { functions } = require("lodash");
 
 
 
@@ -41,7 +51,47 @@ app.use(express.static("public"));
 
 
 
-app.get("/",function(req, res){
+app.get("/", function(req, res){
+  res.render("login");
+
+});
+
+app.post("/", function(req, res){
+ const us= req.body.username;
+ const pas= req.body.password;
+ Users.findOne({email:us, pass:pas}, function(err, found){
+  if(!err){
+    if(found){
+      res.redirect("home");
+    }
+    else{   
+  res.render("login");
+    }
+  }
+  else{
+    console.log(err);
+  }
+ });
+});
+
+
+app.get("/register",function(req, res){
+  res.render("register");
+})
+
+app.post("/register", function(req, res){
+  const users= req.body.username;
+  const pass= req.body.password;
+  const a1= new Users({
+    email: users,
+    pass:pass
+  });
+  a1.save();
+  
+  });
+
+
+app.get("/home",function(req, res){
 
   Blog.find({}, function(err, posts){
     if(!err){
